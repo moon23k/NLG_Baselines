@@ -1,5 +1,5 @@
 # NLG_Basics
-This repo covers Basic Models for Neural Language Generation Tasks(Neural Machine Translation and Dialogue Generation).
+This repo covers Basic Models for Neural Language Generation Tasks (Neural Machine Translation and Dialogue Generation).
 The main purpose is to check the developments while comparing each model.
 For a fairer comparision, some modifications are applied and as a result, some parts may differ from those in papers.
 
@@ -137,7 +137,6 @@ python3 inference.py -model ['seq2seq', 'attention', 'transformer'] -task ['tran
 <br>
 
 ### Dialogue Generation Task
-
 
 <br>
 <br>
