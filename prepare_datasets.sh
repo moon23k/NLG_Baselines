@@ -5,7 +5,7 @@ mkdir -p wmt/seq wmt/tok wmt/ids wmt/vocab daily/seq daily/tok daily/vocab
 
 datasets=(wmt daily)
 splits=(train valid test)
-langs=(en de)
+extensions=(src trg)
 
 #Download Data
 echo "Downloading Dataset"
@@ -17,9 +17,11 @@ bash ../data_processing/process_daily.sh
 #Pre tokenize with moses
 echo "Pretokenize with moses"
 python3 -m pip install -U sacremoses
-for split in "${splits[@]}"; do
-    for lang in "${langs[@]}"; do
-        sacremoses -l ${lang} -j 8 tokenize < seq/${split}.${lang} > tok/${split}.${lang}
+for data in "${datasets[@]}"; do
+    for split in "${splits[@]}"; do
+        for ext in "${extensions[@]}"; do
+            sacremoses -l en -j 8 tokenize < ${data}/seq/${split}.${ext} > ${data}/tok/${split}.${ext}
+        done
     done
 done
 
@@ -39,19 +41,22 @@ cd ../../
 
 #Build Sentencepice Vocab and Model
 echo "Building Vocab"
-cat tok/* > concat.txt
-bash ../data_processing/build_vocab.sh -i concat.txt -p vocab/spm
-rm concat.txt
+for data in "${datasets[@]}"; do
+    cat ${data}/tok/* > ${data}/concat.txt
+    bash ../data_processing/build_vocab.sh -i ${data}/concat.txt -p ${data}/vocab/spm
+    rm ${data}/concat.txt
+done
 
 
 #Tokens to Ids
 echo "Converting Tokens to Ids"
-for split in "${splits[@]}"; do
-    for lang in "${langs[@]}"; do
-        spm_encode --model=vocab/spm.model --extra_options=bos:eos \
-        --output_format=id < tok/${split}.${lang} > ids/${split}.${lang}
-        echo " Converting Tokens to Ids on ${split}.${lang} has completed"
+for data in "${datasets[@]}"; do
+    for split in "${splits[@]}"; do
+        for ext in "${extensions[@]}"; do
+            spm_encode --model=vocab/spm.model --extra_options=bos:eos \
+            --output_format=id < ${data}/tok/${split}.${extensions} > ${data}/ids/${split}.${ext}
+            echo " Converting Tokens to Ids on ${data}/${split}.${ext} has completed"
+        done
     done
 done
-
 rm -rf sentencepiece

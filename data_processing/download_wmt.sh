@@ -17,13 +17,13 @@ cd .. && mv training/europarl* . && rm -r training training-parallel-europarl-v7
 
 
 #concat train files
-cat commoncrawl.de-en.en europarl-v7.de-en.en > train_orig.en
-cat commoncrawl.de-en.de europarl-v7.de-en.de > train_orig.de
+cat commoncrawl.de-en.en europarl-v7.de-en.en > train_orig.src
+cat commoncrawl.de-en.de europarl-v7.de-en.de > train_orig.trg
 
 #downsize train files
-awk '{ if (NR % 10 == 0) print $0; }' train_orig.en > train.en
-awk '{ if (NR % 10 == 0) print $0; }' train_orig.de > train.de
-rm train_orig.en train_orig.de
+awk '{ if (NR % 10 == 0) print $0; }' train_orig.src > train.src
+awk '{ if (NR % 10 == 0) print $0; }' train_orig.trg > train.trg
+rm train_orig.src train_orig.trg
 
 
 #Getting Valid and Test datset
@@ -31,14 +31,14 @@ wget --trust-server-names https://www.statmt.org/wmt14/dev.tgz
 wget --trust-server-names https://www.statmt.org/wmt14/test-filtered.tgz
 tar zxvf dev.tgz && tar zxvf test-filtered.tgz
 
-mv dev/newstest2013.en valid.en
-mv dev/newstest2013.de valid.de
+mv dev/newstest2013.en valid.src
+mv dev/newstest2013.de valid.trg
 
 mv test/newstest2014-deen-src.en.sgm .
 mv test/newstest2014-deen-ref.de.sgm .
 
 wget -nc https://raw.githubusercontent.com/moses-smt/mosesdecoder/master/scripts/ems/support/input-from-sgm.perl
-perl input-from-sgm.perl < newstest2014-deen-src.en.sgm > test.en
-perl input-from-sgm.perl < newstest2014-deen-ref.de.sgm > test.de
+perl input-from-sgm.perl < newstest2014-deen-src.en.sgm > test.src
+perl input-from-sgm.perl < newstest2014-deen-ref.de.sgm > test.trg
 
 rm -rf dev test *sgm *perl *tgz common* euro*
