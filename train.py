@@ -106,10 +106,12 @@ def run(config):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-model', required=True)
+    parser.add_argument('-task', required=True)
     parser.add_argument('-scheduler', default='constant', required=False)
     args = parser.parse_args()
     
     assert args.model in ['seq2seq', 'attention', 'transformer']
+    assert args.task in ['translate', 'dialogue']
     assert args.scheduler in ['constant', 'noam', 'cosine_annealing_warm', 'exponential', 'step']
     
     set_seed()

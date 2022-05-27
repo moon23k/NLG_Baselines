@@ -1,12 +1,10 @@
 import torch
 import argparse
 import sentencepiece as spm
-from sacremoses import MosesTokenizer
-
+from sacremoses import MosesTokenizer, MosesDetokenizer
 from utils.util import Config
 from utils.model import load_model
 from models.transformer.module import create_src_mask, create_trg_mask
-
 
 
 
@@ -22,8 +20,9 @@ def seq2seq_run(model, tokenizer, config, max_tokens=100):
                 break
             
             #Tokenize user Input with Moses
-            mt = MosesTokenizer(lang='en')
-            src = mt.tokenize(src)
+            moses_tokenizer = MosesTokenizer(lang='en')
+            moses_detokenizer = MosesDetokenizer(lang='de')
+            src = moses_tokenizer.tokenize(src)
 
             #Convert tokens to ids with sentencepiece vocab
             src = tokenizer.EncodeAsIds(seq)
@@ -52,6 +51,7 @@ def seq2seq_run(model, tokenizer, config, max_tokens=100):
             
             pred_seq = trg_indice[1:]
             pred_seq = tokenizer.Decode(pred_seq)
+            pred_seq = moses_detokenizer.detokenize(pred.split())
 
             print(f"Model Output Sentence >> {pred_seq}")
 
@@ -68,8 +68,9 @@ def transformer_run(model, tokenizer, config, max_tokens=100):
                 break
             
             #Tokenize user Input with Moses
-            mt = MosesTokenizer(lang='en')
-            src = mt.tokenize(src)
+            moses_tokenizer = MosesTokenizer(lang='en')
+            moses_detokenizer = MosesDetokenizer(lang='en')
+            src = moses_tokenizer.tokenize(src)
 
             #Convert tokens to ids with sentencepiece vocab
             src = tokenizer.EncodeAsIds(seq)
@@ -99,6 +100,7 @@ def transformer_run(model, tokenizer, config, max_tokens=100):
                 
             pred_seq = trg_indice[1:]
             pred_seq = tokenizer.Decode(pred_seq)
+            pred_seq = moses_detokenizer.detokenize(pred.split())
 
             print(f"Model Output Sentence >> {pred_seq}")
 

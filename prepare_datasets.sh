@@ -57,9 +57,8 @@ echo "Converting Tokens to Ids"
 for data in "${datasets[@]}"; do
     for split in "${splits[@]}"; do
         for ext in "${extensions[@]}"; do
-            spm_encode --model=vocab/spm.model --extra_options=bos:eos \
-            --output_format=id < ${data}/tok/${split}.${extensions} > ${data}/ids/${split}.${ext}
-            echo " Converting Tokens to Ids on ${data}/${split}.${ext} has completed"
+            spm_encode --model=${data}/vocab/spm.model --extra_options=bos:eos \
+            --output_format=id < ${data}/tok/${split}.${ext} > ${data}/ids/${split}.${ext}
         done
     done
 done
