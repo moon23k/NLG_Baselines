@@ -1,17 +1,21 @@
 #!/bin/bash
 mkdir -p data
 cd data
-mkdir -p wmt/seq wmt/tok wmt/ids wmt/vocab daily/seq daily/tok daily/vocab
 
 datasets=(wmt daily)
 splits=(train valid test)
 extensions=(src trg)
 
+#Create sub-dirs
+for data in "${datasets[@]}"; do
+    mkdir -p ${data}/seq ${data}/tok ${data}/ids ${data}/vocab
+done
+
 #Download Data
 echo "Downloading Dataset"
-bash ../data_processing/download_wmt.sh
+python3 ../data_processing/download_wmt.py
 bash ../data_processing/download_daily.sh
-bash ../data_processing/process_daily.sh
+python3 ../data_processing/process_daily.py
 
 
 #Pre tokenize with moses
@@ -40,7 +44,7 @@ cd ../../
 
 
 #Build Sentencepice Vocab and Model
-echo "Building Vocab"
+echo "Building Vocabs"
 for data in "${datasets[@]}"; do
     cat ${data}/tok/* > ${data}/concat.txt
     bash ../data_processing/build_vocab.sh -i ${data}/concat.txt -p ${data}/vocab/spm
