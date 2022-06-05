@@ -1,12 +1,13 @@
 # NLG_Basics
-This repo covers Basic Models for Neural Language Generation Tasks (Neural Machine Translation and Dialogue Generation).
+This repo covers Basic Architectures for Neural Language Generation Tasks (Neural Machine Translation and Dialogue Generation).
+Each is **Sequence to Sequence**, **Attention Mechanism**, and **Transformer**.
 The main purpose is to check the developments while comparing each model.
 For a fairer comparision, some modifications are applied and as a result, some parts may differ from those in papers.
 
 <br>
 
 
-## Models desc
+## Architecture desc
 
 ### [Sequence-to-Sequence](https://arxiv.org/abs/1409.3215)
 As the name **"Sequence-to-Sequence"** suggests, it is an end-to-end sequence model.
