@@ -20,7 +20,7 @@ from utils.train import seq_train, seq_eval, trans_train, trans_eval
 
 def run(config):
     #set checkpoint, record path
-    chk_dir = f"checkpoints/"
+    chk_dir = f"checkpoints/{config.task}"
     os.makedirs(chk_dir, exist_ok=True)
     
     chk_file = f"{config.model}_states.pt"

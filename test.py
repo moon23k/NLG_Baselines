@@ -17,16 +17,17 @@ from utils.util import Config, epoch_time, set_seed
 
 def seq_bleu(model, dataloader, tokenizer):
     total_bleu = 0
-    with torch.no_grad():
-        for i, batch in enumerate(dataloader):
-            src, trg = batch[0].to(config.device), batch[1].to(config.device)
+    
+    for i, batch in enumerate(dataloader):
+        src, trg = batch[0].to(config.device), batch[1].to(config.device)
+        with torch.no_grad():
             pred = model(src, trg)
 
-            pred = [[str(ids) for ids in seq if ids !=1] for seq in pred.argmax(-1).tolist()]
-            trg = [[[str(ids) for ids in seq if ids !=1]] for seq in trg.tolist()]
-            
-            bleu = bleu_score(pred, trg)
-            total_bleu += bleu
+        pred = [[str(ids) for ids in seq if ids !=1] for seq in pred.argmax(-1).tolist()]
+        trg = [[[str(ids) for ids in seq if ids !=1]] for seq in trg.tolist()]
+        
+        bleu = bleu_score(pred, trg)
+        total_bleu += bleu
 
     total_bleu = round(total_bleu * 100, 2)
     return bleu
@@ -36,16 +37,18 @@ def seq_bleu(model, dataloader, tokenizer):
 
 def trans_bleu(model, dataloader, tokenizer):
     total_bleu = 0
-    with torch.no_grad():
-        for i, batch in enumerate(dataloader):
-            src, trg = batch[0].to(config.device), batch[1].to(config.device)
+    
+    for i, batch in enumerate(dataloader):
+        src, trg = batch[0].to(config.device), batch[1].to(config.device)
+    
+        with torch.no_grad():        
             pred = model(src, trg)
 
-            pred = [[str(ids) for ids in seq if ids !=1] for seq in pred.argmax(-1).tolist()]
-            trg = [[[str(ids) for ids in seq if ids !=1]] for seq in trg.tolist()]
+        pred = [[str(ids) for ids in seq if ids !=1] for seq in pred.argmax(-1).tolist()]
+        trg = [[[str(ids) for ids in seq if ids !=1]] for seq in trg.tolist()]
 
-            bleu = bleu_score(pred, trg)
-            total_bleu += bleu
+        bleu = bleu_score(pred, trg)
+        total_bleu += bleu
 
     total_bleu = round(total_bleu * 100, 2)
     return total_bleu
@@ -54,17 +57,17 @@ def trans_bleu(model, dataloader, tokenizer):
 
 
 def run(config):
-    chk_file = f"checkpoints/{config.model}_states.pt"
+    chk_file = f"checkpoints/{config.task}/{config.model}_states.pt"
     test_dataloader = get_dataloader('test', config)
 
     #Load Tokenizer
     tokenizer = spm.SentencePieceProcessor()
-    tokenizer.load('data/vocab/spm.model')
+    tokenizer.load(f'data/{config.task}/vocab/spm.model')
     tokenizer.SetEncodeExtraOptions('bos:eos')
 
     #Load Model
     model = load_model(config)
-    model_state = torch.load(f'checkpoints/{config.model}_states.pt', map_location=config.device)['model_state_dict']
+    model_state = torch.load(f'checkpoints/{config.task}/{config.model}_states.pt', map_location=config.device)['model_state_dict']
     model.load_state_dict(model_state)
     model.eval()
 
@@ -89,9 +92,11 @@ def run(config):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-model', required=True)
+    parser.add_argument('-task', required=True)
     args = parser.parse_args()
 
     assert args.model in ['seq2seq', 'attention', 'transformer']
+    assert args.task in ['translate', 'dialogue']
 
     set_seed()
     config = Config(args)

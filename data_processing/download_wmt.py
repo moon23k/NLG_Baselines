@@ -13,43 +13,34 @@ def split_data(data_obj):
 
 
 
-def save_file(data_obj, f_name):
-	with open(f'wmt/seq/{f_name}', 'w') as f:
-		f.write('\n'.join(data_obj))
+def save_text(data, f_name):
+	with open(f'translate/seq/{f_name}', 'w') as f:
+		f.write('\n'.join(data))
 
 
 
-def run():
-	train = load_dataset('wmt14', 'de-en', split='train')
-	valid = load_dataset('wmt14', 'de-en', split='validation')
-	test = load_dataset('wmt14', 'de-en', split='test')
+def process_data(split):
+	assert split in ['train', 'validation', 'test']
 
-	train = train['translation']
-	valid = valid['translation']
-	test = test['translation']
+	data = load_dataset('wmt14', 'de-en', split=split)
+	data = data['translation']
 
-	#Downsize train dataset
-	train = train[::10]
+	if split == 'train':
+		data = data[::10]
+	elif split == 'validation':
+		split = 'valid'
 
-	#split data
-	train_src, train_trg = split_data(train)
-	valid_src, valid_trg = split_data(valid)
-	test_src, test_trg = split_data(test)
+	src, trg = split_data(data)
+	save_text(src, f"{split}.src")
+	save_text(trg, f"{split}.trg")
 
-
-	#save data obj to files
-	save_file(train_src, 'train.src')
-	save_file(train_trg, 'train.trg')
-
-	save_file(valid_src, 'valid.src')
-	save_file(valid_trg, 'valid.trg')
-
-	save_file(test_src, 'test.src')
-	save_file(test_trg, 'test.trg')
 
 
 
 if __name__ == '__main__':
-	run()
-	files = next(os.walk('wmt/seq'))[2]
+	process_data('train')
+	process_data('validation')
+	process_data('test')
+	
+	files = next(os.walk('translate/seq'))[2]
 	assert len(files) == 6

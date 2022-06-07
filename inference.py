@@ -31,7 +31,7 @@ def seq2seq_run(model, tokenizer, config, max_tokens=100):
 
             #Convert ids to tensor
             src = torch.tensor(src, dtype=torch.long).unsqueeze(0)
-            
+
             src = model.embedding(src)
             enc_out = model.encoder(src)
             trg_indice = [tokenizer.bos_id()]
@@ -110,26 +110,26 @@ def transformer_run(model, tokenizer, config, max_tokens=100):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-model', required=True)
-    parser.add_argument('-action', required=True)
+    parser.add_argument('-task', required=True)
     parser.add_argument('-scheduler', default='constant', required=False)
     args = parser.parse_args()
     
 
     assert args.model in ['seq2seq', 'attention', 'transformer']
-    assert args.action in ['translation', 'chat']
+    assert args.task in ['translation', 'dialogue']
 
     config = Config(args)
     config.device = torch.device('cpu')
 
     #Load Model
     model = load_model(config)
-    model_state = torch.load()
+    model_state = torch.load(f'checkpoints/{config.task}/{config.model}_states.pt', map_location=config.device)['model_state_dict']
     model.load_state_dict(model_state)
     model.eval()
 
     #Load Tokenizer
     tokenizer = spm.SentencePieceProcessor()
-    tokenizer.load('data/vocab/spm.model')
+    tokenizer.load(f'data/{config.task}/vocab/spm.model')
     tokenizer.SetEncodeExtraOptions('bos:eos')
 
 
