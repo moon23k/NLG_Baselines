@@ -18,6 +18,7 @@ python3 ../data_processing/download_wmt.py
 bash ../data_processing/download_dialogue.sh
 python3 ../data_processing/process_dialogue.py
 
+rm -rf dialogue/dailydialog dialogue/Persona-Chat dialogue/empatheticdialogues dialogue/blended_skill_talk
 
 #Pre tokenize with moses
 echo "Pretokenize with moses"

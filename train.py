@@ -13,14 +13,14 @@ from utils.util import Config, epoch_time, set_seed
 from utils.data import get_dataloader
 from utils.model import load_model
 from utils.scheduler import get_scheduler
-from utils.train import seq_train, seq_eval, trans_train, trans_eval
+from utils.train import train_seq, eval_seq, train_trans, eval_trans
 
 
 
 
 def run(config):
     #set checkpoint, record path
-    chk_dir = f"checkpoints/{config.task}"
+    chk_dir = f"checkpoints/{config.task}/"
     os.makedirs(chk_dir, exist_ok=True)
     
     chk_file = f"{config.model}_states.pt"
@@ -54,11 +54,11 @@ def run(config):
 
         print(f"Epoch {epoch}/{config.n_epochs}")
         if config.model == 'transformer':
-            train_loss = trans_train(model, train_dataloader, criterion, optimizer, config)
-            valid_loss = trans_eval(model, valid_dataloader, criterion, config)
+            train_loss = train_trans(model, train_dataloader, criterion, optimizer, config)
+            valid_loss = eval_trans(model, valid_dataloader, criterion, config)
         else:
-            train_loss = seq_train(model, train_dataloader, criterion, optimizer, config)
-            valid_loss = seq_eval(model, valid_dataloader, criterion, config)
+            train_loss = train_seq(model, train_dataloader, criterion, optimizer, config)
+            valid_loss = eval_seq(model, valid_dataloader, criterion, config)
         
         end_time = time.time()
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)

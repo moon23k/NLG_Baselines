@@ -9,7 +9,7 @@ from models.transformer.module import create_src_mask, create_trg_mask
 
 
 
-def seq2seq_run(model, tokenizer, config, max_tokens=100):
+def infer_seq(model, tokenizer, config, max_tokens=100):
     with torch.no_grad():
         print('Type "quit" to terminate Inference')
         while True:
@@ -58,7 +58,7 @@ def seq2seq_run(model, tokenizer, config, max_tokens=100):
 
 
 
-def transformer_run(model, tokenizer, config, max_tokens=100):
+def infer_trans(model, tokenizer, config, max_tokens=100):
     with torch.no_grad():
         print('Type "quit" to terminate Model Inference')
         while True:
@@ -134,6 +134,6 @@ if __name__ == '__main__':
 
 
     if config.model == 'transformer':
-        transformer_run(model, tokenizer, config)
+        infer_trans(model, tokenizer, config)
     else:
-        seq2seq_run(model, tokenizer, config)
+        infer_seq(model, tokenizer, config)

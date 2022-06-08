@@ -1,3 +1,4 @@
+import math
 import time
 import argparse
 
@@ -8,50 +9,36 @@ import sentencepiece as spm
 
 from utils.data import get_dataloader
 from utils.model import load_model
-from utils.train import seq_eval, trans_eval 
+from utils.train import eval_epoch
 from utils.util import Config, epoch_time, set_seed
 
 
 
 
+def get_bleu(model, dataloader, tokenizer, config):
+    model.eval()
+    candidates, references = [], []
 
-def seq_bleu(model, dataloader, tokenizer):
-    total_bleu = 0
-    
     for i, batch in enumerate(dataloader):
         src, trg = batch[0].to(config.device), batch[1].to(config.device)
-        with torch.no_grad():
-            pred = model(src, trg)
-
-        pred = [[str(ids) for ids in seq if ids !=1] for seq in pred.argmax(-1).tolist()]
-        trg = [[[str(ids) for ids in seq if ids !=1]] for seq in trg.tolist()]
         
-        bleu = bleu_score(pred, trg)
-        total_bleu += bleu
-
-    total_bleu = round(total_bleu * 100, 2)
-    return bleu
-
-
-
-
-def trans_bleu(model, dataloader, tokenizer):
-    total_bleu = 0
-    
-    for i, batch in enumerate(dataloader):
-        src, trg = batch[0].to(config.device), batch[1].to(config.device)
-    
         with torch.no_grad():        
-            pred = model(src, trg)
+            if config.model == 'transformer':
+                pred = model(src, trg[:, :-1])
+            else:
+                pred = model(src, trg)
+        
+        pred = pred.tolist()
+        trg = trg.tolist()
 
-        pred = [[str(ids) for ids in seq if ids !=1] for seq in pred.argmax(-1).tolist()]
-        trg = [[[str(ids) for ids in seq if ids !=1]] for seq in trg.tolist()]
+        for can, ref in zip(pred, trg):
+            candidates.append(tokenizer.Decode(can))
+            references.append([tokenizer.Decode(ref)])
 
-        bleu = bleu_score(pred, trg)
-        total_bleu += bleu
 
-    total_bleu = round(total_bleu * 100, 2)
-    return total_bleu
+    bleu_score = bleu_score(candidates, references, weights=[0.25, 0.25, 0.25, 0.25])
+    
+    return round(bleu_score * 100, 2)
 
 
 
@@ -69,23 +56,24 @@ def run(config):
     model = load_model(config)
     model_state = torch.load(f'checkpoints/{config.task}/{config.model}_states.pt', map_location=config.device)['model_state_dict']
     model.load_state_dict(model_state)
-    model.eval()
 
     criterion = nn.CrossEntropyLoss(ignore_index=config.pad_idx).to(config.device)
 
-    start_time = time.time()
+
     print('Test')
-    if config.model == 'transformer':
-        test_loss = trans_eval(model, test_dataloader, criterion, config)
-        test_bleu = trans_bleu(model, test_dataloader, tokenizer)
-    else:
-        test_loss = seq_eval(model, test_dataloader, criterion, config)
-        test_bleu = seq_bleu(model, test_dataloader, tokenizer)
+    start_time = time.time()
+    test_loss = eval_epoch(model, test_dataloader, criterion, config)
+    
+    if config.task == 'translate':
+        test_bleu = get_bleu(model, test_dataloader, tokenizer, config)
+
     end_time = time.time()
     test_mins, test_secs = epoch_time(start_time, end_time)
 
-    print(f"[ Test Loss: {test_loss} / Test BLEU Score: {test_bleu} / Time: {test_mins}min {test_secs}sec ]")
-
+    if config.task == 'translate':
+        print(f"[ Test Loss: {test_loss} / Test BLEU Score: {test_bleu} / Time: {test_mins}min {test_secs}sec ]")
+    elif config.task == 'dialogue':
+        print(f"[ Test Loss: {test_loss} / Test PPL Score: {math.exp(test_loss):.2f} / Time: {test_mins}min {test_secs}sec ]")
 
 
 
@@ -93,11 +81,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-model', required=True)
     parser.add_argument('-task', required=True)
+    parser.add_argument('-scheduler', default='constant', required=False)
     args = parser.parse_args()
 
     assert args.model in ['seq2seq', 'attention', 'transformer']
     assert args.task in ['translate', 'dialogue']
-
+ 
     set_seed()
     config = Config(args)
     run(config)

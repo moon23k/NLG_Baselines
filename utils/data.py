@@ -55,18 +55,13 @@ def _collate_fn(data_batch):
 
 
 
-def get_dataloader(split, config):
-    if config.task == 'translate':
-        d_name = 'wmt'
-    elif config.task == 'dialogue':
-        d_name = 'daily'
-        
+def get_dataloader(split, config):        
     if config.model == 'seq2seq':
-        src = read_text(d_name, f"{split}.src", reverse=True)
-        trg = read_text(d_name, f"{split}.trg", reverse=True)
+        src = read_text(config.task, f"{split}.src", reverse=True)
+        trg = read_text(config.task, f"{split}.trg", reverse=True)
     else:
-        src = read_text(d_name, f"{split}.src")
-        trg = read_text(d_name, f"{split}.trg")
+        src = read_text(config.task, f"{split}.src")
+        trg = read_text(config.task, f"{split}.trg")
 
     dataset = CustomDataset(src, trg)
     iterator = DataLoader(dataset, batch_size=config.batch_size, shuffle=True, collate_fn=_collate_fn, num_workers=2)

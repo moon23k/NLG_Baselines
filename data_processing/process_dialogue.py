@@ -81,7 +81,7 @@ def split_dialogue(dataset, f_path=None, split=None):
 def process_daily(split, save=False):
     assert split in ['train', 'valid', 'test']
 
-    orig = [json.loads(line) for line in open(f'dailogue/dailydialog/{split}.json', 'r')]
+    orig = [json.loads(line) for line in open(f'dialogue/dailydialog/{split}.json', 'r')]
     processed = []
 
     for elem in orig:
