@@ -59,7 +59,7 @@ def eval_epoch(model, dataloader, criterion, config):
         epoch_loss += loss.item()
 
         if (i + 1) % 10 == 0:
-            print(f"---- Train Step: {i+1}/{total_len} Train Loss: {loss:.3f}")
+            print(f"---- Eval Step: {i+1}/{total_len} Eval Loss: {loss:.3f}")
 
     return epoch_loss / total_len
 

@@ -28,17 +28,21 @@ def get_bleu(model, dataloader, tokenizer, config):
             else:
                 pred = model(src, trg)
         
+        pred = pred.argmax(-1)
         pred = pred.tolist()
-        trg = trg.tolist()
+        trg = trg[:, 1:].tolist()
 
         for can, ref in zip(pred, trg):
-            candidates.append(tokenizer.Decode(can))
-            references.append([tokenizer.Decode(ref)])
+            can = tokenizer.Decode(can).split()
+            ref = tokenizer.Decode(ref).split()
+        
+            candidates.append(can)
+            references.append([ref])
 
 
-    bleu_score = bleu_score(candidates, references, weights=[0.25, 0.25, 0.25, 0.25])
+    score = bleu_score(candidates, references, weights=[0.25, 0.25, 0.25, 0.25])
     
-    return round(bleu_score * 100, 2)
+    return round(score * 100, 2)
 
 
 
