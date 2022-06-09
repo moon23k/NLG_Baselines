@@ -56,7 +56,7 @@ But the Transformer solved these problems only with Attentions. As a result, the
 
 * **Tasks:** Neural Machine Translation, Dialogue Generation
 * **NMT Dataset:** downsized WMT14 EN-DE dataset (4.5M -> 450K)
-* **Dialogue Dataset:** Daliy Dialgue Dataset (Processed from Multi-Turn to Single-Turn Dialogue)
+* **Dialogue Dataset:** Processed Single-Turn Dialogue Dataset (400K) &nbsp; [see more detail](https://github.com/moon23k/NLP_datasets/tree/main/Dialogue)
 * **Tokenization:** Applied Moses Tokenization first, and then applied BPE Tokenziation
 * **Loss Function:** Cross Entropy Loss
 * **Optimizer:** Adam Optimizer
@@ -121,23 +121,34 @@ python3 inference.py -model ['seq2seq', 'attention', 'transformer'] -task ['tran
 ## Results
 
 ### NMT Task
-**Expected BLEU Score** 
-* Seq2Seq Model : About 10
-* Seq2Seq with Attention Model : About 15
-* Transformer Model : About 20
 
-(The value based on the Best Performance posed on "paperswithcode" home page with wmt14 en-de dataset)
+**Quantative Evaluation**
+| Model | Best Training Loss | Best Test Loss | BLEU Score |
+|---|---|---|---|
+|Seq2Seq||||
+|Attention||||
+|Transformer||||
 
 <br>
 
-**Actual BLEU Score**
-* Seq2Seq Model : 
-* Seq2Seq with Attention Model : 
-* Transformer Model : 
+**Qualitive Evaluation**
+
 
 <br>
 
 ### Dialogue Generation Task
+
+**Quantative Evaluation**
+| Model | Best Training Loss | Best Test Loss | PPL Score |
+|---|---|---|---|
+|Seq2Seq||||
+|Attention||||
+|Transformer||||
+<br>
+
+**Qualitive Evaluation**
+
+
 
 <br>
 <br>
