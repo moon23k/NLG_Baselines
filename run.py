@@ -45,9 +45,8 @@ class Config(object):
         self.tokenizer_path = f'data/{self.task}/tokenizer.json'
 
         use_cuda = torch.cuda.is_available()
-        self.device_type = 'cuda' \
-                           if use_cuda and self.mode != 'inference' \
-                           else 'cpu'
+        device_condition = use_cuda and self.mode != 'inference'
+        self.device_type = 'cuda' if device_condition else 'cpu'
         self.device = torch.device(self.device_type)
 
 
@@ -95,17 +94,18 @@ def main(args):
 
 
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-task', required=True)
     parser.add_argument('-mode', required=True)
     parser.add_argument('-model', required=True)
-    parser.add_argument('-search', default='greedy', required=False)
+    
     
     args = parser.parse_args()
-    assert args.task in ['translation', 'dialogue', 'summarization']
-    assert args.mode in ['train', 'test']
-    assert args.model in ['rnn', 'rnn_attn', 'transformer']
-    assert args.search in ['greedy', 'beam']
+    assert args.task.lower() in ['translation', 'dialogue', 'summarization']
+    assert args.mode.lower() in ['train', 'test']
+    assert args.model.lower() in ['rnn', 'rnn_attn', 'transformer']
+
 
     if args.mode == 'train':
         os.makedirs(f"ckpt/{args.task}", exist_ok=True)
